@@ -5,6 +5,12 @@ class StaticPagesController < ApplicationController
     FlickRaw.api_key = ENV['FLICKRAW_API_KEY']
     FlickRaw.shared_secret = ENV['FLICKRAW_SHARED_SECRET']
     flickr = FlickRaw::Flickr.new #(ENV['FLICKRAW_API_KEY'], ENV['FLICKRAW_SHARED_SECRET'])
-    @photos = flickr.people.getPublicPhotos(user_id: @flickr_id, per_page: 50)
+    begin
+      @photos = flickr.people.getPublicPhotos(user_id: @flickr_id, per_page: 50)
+    rescue
+      flash.now[:warning] = 'User not found displaying default'
+      @flickr_id = ENV['FLICKR_USERNAME']
+      @photos = flickr.people.getPublicPhotos(user_id: @flickr_id, per_page: 50)
+    end
   end
 end
